@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Animated Routing</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div id="map" style="width:100%; height: 100vh"></div>
+	<script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+	<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+
+	<script>
+
+		var map = L.map('map').setView([-39.041319605,174.1320991516], 14);
+		mapLink = "<a href='http://openstreetmap.org'>OpenStreetMap</a>";
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: 'Leaflet &copy; ' + mapLink + ', contribution', maxZoom: 18 }).addTo(map);
+
+		var taxiIcon = L.icon({
+			iconUrl: 'img/red_marker.png',
+			iconSize: [20, 20]
+		})
+		var blackIcon = L.icon({
+        	iconUrl: 'img/black_marker.png',
+        	iconSize: [20, 20]
+		})
+
+		var marker = L.marker([-39.05068221747875,174.0992828722834], { icon: taxiIcon }).addTo(map);
+		var secondMarker = L.marker([-39.02514427,174.1423674], {icon: blackIcon}).addTo(map);
+
+		map.on('click', function (e) {
+			console.log(e)
+//			var newMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+			L.Routing.control({
+				waypoints: [
+					L.latLng(-39.05068221747875,174.0992828722834),
+					L.latLng(secondMarker._latlng.lat, secondMarker._latlng.lng)
+				]
+			}).on('routesfound', function (e) {
+				var routes = e.routes;
+				console.log(routes);
+
+				e.routes[0].coordinates.forEach(function (coord, index) {
+					setTimeout(function () {
+						marker.setLatLng([coord.lat, coord.lng]);
+					}, 100 * index)
+				})
+
+			}).addTo(map);
+		});
+
+
+	</script>
+
+
+</body>
+
+</html>
